@@ -15,6 +15,7 @@ namespace PT4.ViewModel
         private string? imageSource;
         private string? extension;
         private long size;
+        private string statusMessage;
 
         public FileSystemInfoViewModel(ViewModelBase owner)
         {
@@ -114,8 +115,24 @@ namespace PT4.ViewModel
             }
         }
 
+        public string StatusMessage
+        {
+            get
+            {
+                return statusMessage;
+            }
+            set
+            {
+                if (value != null && statusMessage != value)
+                {
+                    statusMessage = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-      
+
+
 
         public virtual void Sort(SortingViewModel sorting)
         {

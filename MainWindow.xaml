@@ -14,7 +14,8 @@
                     Command="{Binding OpenFileCommand}" CommandParameter="{Binding}"/>
         </ContextMenu>
 
-       
+       
+
         <local:LangBoolConverter x:Key="LangBoolConverter"/>
         <Style x:Key="LangButtonStyle" TargetType="ToggleButton">
             <Setter Property="BorderThickness" Value="0" />
@@ -91,7 +92,7 @@
             </TextBox>
         </ScrollViewer>
         <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
-            <TextBlock Name="PropertiesTextBlock" ></TextBlock>
+            <TextBlock Name="PropertiesTextBlock" Text="{Binding StatusMessage}"></TextBlock>
         </StatusBar>
 
     </Grid>

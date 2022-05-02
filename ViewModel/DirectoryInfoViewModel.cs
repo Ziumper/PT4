@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,7 +20,35 @@ namespace PT4.ViewModel
 
         public DirectoryInfoViewModel(ViewModelBase owner) : base(owner)
         {
+            Items.CollectionChanged += Items_CollectionChanged;
         }
+
+        private void Items_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var item in args.NewItems.Cast<FileSystemInfoViewModel>())
+                    {
+                        item.PropertyChanged += Item_PropertyChanged;
+                    }
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var item in args.NewItems.Cast<FileSystemInfoViewModel>())
+                    {
+                        item.PropertyChanged -= Item_PropertyChanged;
+                    }
+                    break;
+            }
+
+        }
+
+        private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs args)
+        {
+            if (args.PropertyName == "StatusMessage" && sender is FileSystemInfoViewModel viewModel)
+                this.StatusMessage = viewModel.StatusMessage;
+        }
+
 
         public new FileSystemInfo? Model
         {
@@ -50,7 +80,7 @@ namespace PT4.ViewModel
 
         public new string ImageSource { get => imageSource; private set { } }
 
-        public ObservableCollection<FileSystemInfoViewModel> Items { get; private set; } = new ObservableCollection<FileSystemInfoViewModel>();
+        public DispatchedObservableCollection<FileSystemInfoViewModel> Items { get; private set; } = new DispatchedObservableCollection<FileSystemInfoViewModel>();
         public Exception? Exception { get; private set; }
 
         public void OnFileSystemChanged(object sender, FileSystemEventArgs e)
@@ -61,6 +91,7 @@ namespace PT4.ViewModel
 
         public bool Open(string path)
         {
+            StatusMessage = Strings.Loading;
             this.path = path;
             bool result = false;
             try

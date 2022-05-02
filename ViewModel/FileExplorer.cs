@@ -3,6 +3,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -12,6 +13,7 @@ namespace PT4.ViewModel
     {
         private DirectoryInfoViewModel root;
         private SortingViewModel sorting;
+        private string statusMessage;
 
         public static readonly string[] TextFilesExtensions = new string[] { ".txt", ".ini", ".log" };
         public event EventHandler<FileInfoViewModel> OnOpenFileRequest;
@@ -51,12 +53,28 @@ namespace PT4.ViewModel
             }
         }
 
+        public string StatusMessage { 
+            get 
+            { 
+                return statusMessage; 
+            }
+            set 
+            {
+                if (value != null && statusMessage != value)
+                {
+                    statusMessage = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
 
         public FileExplorer()
         {
             NotifyPropertyChanged(nameof(Lang));
 
             root = new DirectoryInfoViewModel(this);
+            root.PropertyChanged += Root_PropertyChanged;
             NotifyPropertyChanged(nameof(Root));
 
             sorting = new SortingViewModel();
@@ -66,11 +84,17 @@ namespace PT4.ViewModel
 
             Sorting.PropertyChanged += OnSortingPropertyChanged;
 
-            OpenRootFolderCommand = new RelayCommand(OpenRootFolderExecute);
+            OpenRootFolderCommand = new RelayCommand(OpenRootFolderExecuteAsync);
             SortRootFolderCommand = new RelayCommand(SortRootFolderExecute, CanExecuteSort);
             ExitCommand = new RelayCommand(ExitExecute);
 
             OpenFileCommand = new RelayCommand(OnOpenFileCommand, OpenFileCanExecute);
+        }
+
+        private void Root_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "StatusMessage" && sender is FileSystemInfoViewModel viewModel)
+                this.StatusMessage = viewModel.StatusMessage;
         }
 
         public string GetFileContent(FileInfoViewModel viewModel)
@@ -140,6 +164,22 @@ namespace PT4.ViewModel
             }
 
             Root.Sort(Sorting);
+        }
+
+        private async void OpenRootFolderExecuteAsync(object parameter)
+        {
+            var dlg = new System.Windows.Forms.FolderBrowserDialog() { Description = Strings.Open_Directory };
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                await Task.Factory.StartNew(() =>
+                {
+         
+                var path = dlg.SelectedPath;
+                    OpenRoot(path);
+                });
+            }
+
+            StatusMessage = Strings.Ready;
         }
 
         private void OpenRoot(string path)

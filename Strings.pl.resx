@@ -132,11 +132,17 @@
   <data name="File" xml:space="preserve">
     <value>Plik</value>
   </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Ładowanie </value>
+  </data>
   <data name="Open_Directory" xml:space="preserve">
     <value>Otwórz katalog</value>
   </data>
   <data name="Open_File" xml:space="preserve">
     <value>Otwórz plik</value>
+  </data>
+  <data name="Ready" xml:space="preserve">
+    <value>Gotowe</value>
   </data>
   <data name="Sorting" xml:space="preserve">
     <value>Sortowanie</value>
