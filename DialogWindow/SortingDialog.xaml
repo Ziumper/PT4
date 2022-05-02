@@ -1,0 +1,58 @@
+﻿<Window x:Class="PT4.DialogWindow.SortingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PT4.DialogWindow"
+        mc:Ignorable="d"
+        xmlns:viewmodel="clr-namespace:PT4.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:SortingViewModel}"
+        Title="SortingDialog"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <local:SortByBoolConverter x:Key="SortByBoolConverter"/>
+        <local:DirectionBoolConverter x:Key="DirectionBoolConverter" />
+        <Style x:Key="{x:Type RadioButton}" TargetType="{x:Type RadioButton}">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="Width" Value="auto" />
+        </Style>
+        <Style x:Key="{x:Type Label}" TargetType="{x:Type Label}">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <StackPanel Margin="10" Height="auto">
+            <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_By}"/>
+            <RadioButton  IsChecked="{Binding SortBy, Converter={StaticResource SortByBoolConverter}, ConverterParameter=0}"
+                          GroupName="sortBy"  Name="AlphabeticallyType">
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_Alphabetically}"/>
+            </RadioButton>
+            <RadioButton IsChecked="{Binding SortBy, Converter={StaticResource SortByBoolConverter}, ConverterParameter=1}"
+                         GroupName="sortBy" Name="ExtensionsType" >
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_Extensions}"/>
+            </RadioButton>
+            <RadioButton
+                IsChecked="{Binding SortBy, Converter={StaticResource SortByBoolConverter}, ConverterParameter=2}"
+                GroupName="sortBy" Name="SizeType">
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_Size}"/>
+            </RadioButton>
+            <RadioButton
+                IsChecked="{Binding SortBy, Converter={StaticResource SortByBoolConverter}, ConverterParameter=3}"
+                GroupName="sortBy" Name="LastDateModificationType">
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_Modification_Date}"/>
+            </RadioButton>
+
+            <Label Content="{Binding Source={StaticResource Strings}, Path=Sort_Order}"/>
+            <RadioButton
+                IsChecked="{Binding Direction, Converter={StaticResource DirectionBoolConverter}, ConverterParameter=0}"
+                GroupName="sortOrder" Name="Ascending">
+                <Label  Content="{Binding Source={StaticResource Strings}, Path=Ascending_Order}"/>
+            </RadioButton>
+            <RadioButton
+                IsChecked="{Binding Direction, Converter={StaticResource DirectionBoolConverter}, ConverterParameter=1}"
+                GroupName="sortOrder" Name="Descending">
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Descending_Order}"/>
+            </RadioButton>
+        </StackPanel>
+    </Grid>
+</Window>

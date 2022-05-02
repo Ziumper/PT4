@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="FolderClose.png" />
+    <None Remove="Resources\EN.png" />
+    <None Remove="Resources\FolderClose.png" />
+    <None Remove="Resources\icon-file.png" />
+    <None Remove="Resources\icon-pdf.png" />
+    <None Remove="Resources\icon-txt.png" />
+    <None Remove="Resources\PL.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\EN.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\FolderClose.png" />
+    <Resource Include="Resources\icon-file.png" />
+    <Resource Include="Resources\icon-pdf.png" />
+    <Resource Include="Resources\icon-txt.png" />
+    <Resource Include="Resources\PL.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Strings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Strings.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
