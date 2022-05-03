@@ -120,6 +120,9 @@
   <data name="Ascending_Order" xml:space="preserve">
     <value>Ascending</value>
   </data>
+  <data name="Created_Sorting" xml:space="preserve">
+    <value>Sroting task has been created for:</value>
+  </data>
   <data name="Descending_Order" xml:space="preserve">
     <value>Descending</value>
   </data>

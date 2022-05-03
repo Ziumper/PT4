@@ -70,6 +70,15 @@ namespace PT4 {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Sroting task has been created for:.
+        /// </summary>
+        public static string Created_Sorting {
+            get {
+                return ResourceManager.GetString("Created_Sorting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Descending.
         /// </summary>
         public static string Descending_Order {

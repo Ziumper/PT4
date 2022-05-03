@@ -120,6 +120,9 @@
   <data name="Ascending_Order" xml:space="preserve">
     <value>Rosnąco</value>
   </data>
+  <data name="Created_Sorting" xml:space="preserve">
+    <value>Stworzono zadanie sortowania dla:</value>
+  </data>
   <data name="Descending_Order" xml:space="preserve">
     <value>Malejąco</value>
   </data>

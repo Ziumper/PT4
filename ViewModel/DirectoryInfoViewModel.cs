@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -47,6 +49,9 @@ namespace PT4.ViewModel
         {
             if (args.PropertyName == "StatusMessage" && sender is FileSystemInfoViewModel viewModel)
                 this.StatusMessage = viewModel.StatusMessage;
+
+            if(args.PropertyName == "CurrentMaxThread" && sender is FileSystemInfoViewModel viewModelThread)
+                this.CurrentMaxThread = viewModelThread.CurrentMaxThread;
         }
 
 
@@ -113,14 +118,39 @@ namespace PT4.ViewModel
         public override void Sort(SortingViewModel sortingViewModel)
         {
             bool isEmpty = !IsInitlized;
-            
             if (isEmpty) return;
 
-            foreach (var item in Items)
+          
+
+            List<Task> tasks = new List<Task>();
+            foreach(var item in Items)
             {
-                item.Sort(sortingViewModel);              
+                Task task = null;
+                if (item is DirectoryInfoViewModel)
+                {
+                    task = Task.Factory.StartNew(() =>
+                    {
+                        var threadId = Thread.CurrentThread.ManagedThreadId;
+                        CurrentMaxThread = threadId;
+                        Debug.WriteLine("Thread id:" + threadId);
+                        Debug.WriteLine("Sorting directory: " + item?.Model?.Name);
+                        item?.Sort(sortingViewModel);
+                        Debug.WriteLine("Completed: " + item?.Model?.Name);
+
+                    }, TaskCreationOptions.PreferFairness);
+
+                    if (item?.Model?.FullName != null)
+                    {
+                        StatusMessage = Strings.Created_Sorting + item.Model.FullName;
+                    }
+                }
+
+                if(task != null)tasks.Add(task);
             }
 
+            Task.WaitAll(tasks.ToArray());
+
+           
             var orderableItems = Items.OrderBy(OrderByType);
 
             if (sortingViewModel.Direction == Direction.Ascending)
@@ -183,6 +213,7 @@ namespace PT4.ViewModel
             }
 
         }
+
 
         private int OrderByType(ViewModelBase item)
         {

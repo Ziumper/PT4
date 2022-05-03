@@ -16,6 +16,7 @@ namespace PT4.ViewModel
         private string? extension;
         private long size;
         private string statusMessage;
+        private int currentMaxThread;
 
         public FileSystemInfoViewModel(ViewModelBase owner)
         {
@@ -126,6 +127,19 @@ namespace PT4.ViewModel
                 if (value != null && statusMessage != value)
                 {
                     statusMessage = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public int CurrentMaxThread
+        {
+            get => currentMaxThread;
+            set
+            {
+                if(value > currentMaxThread)
+                {
+                    currentMaxThread = value;
                     NotifyPropertyChanged();
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using PT4.DialogWindow;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace PT4.ViewModel
         private DirectoryInfoViewModel root;
         private SortingViewModel sorting;
         private string statusMessage;
+        private int currentMaxThread;
 
         public static readonly string[] TextFilesExtensions = new string[] { ".txt", ".ini", ".log" };
         public event EventHandler<FileInfoViewModel> OnOpenFileRequest;
@@ -68,6 +70,22 @@ namespace PT4.ViewModel
             }
         }
 
+        public int CurrentMaxThread
+        {
+            get
+            {
+                return currentMaxThread;
+            }
+            set
+            {
+                if (value > currentMaxThread) { 
+                    currentMaxThread = value;
+                    NotifyPropertyChanged();
+                }
+                
+            }
+        }
+
 
         public FileExplorer()
         {
@@ -82,7 +100,7 @@ namespace PT4.ViewModel
             sorting.Direction = Enum.Direction.Ascending;
             NotifyPropertyChanged(nameof(Sorting));
 
-            Sorting.PropertyChanged += OnSortingPropertyChanged;
+            Sorting.PropertyChanged += OnSortingPropertyChangedAsync;
 
             OpenRootFolderCommand = new RelayCommand(OpenRootFolderExecuteAsync);
             SortRootFolderCommand = new RelayCommand(SortRootFolderExecute, CanExecuteSort);
@@ -95,6 +113,9 @@ namespace PT4.ViewModel
         {
             if (e.PropertyName == "StatusMessage" && sender is FileSystemInfoViewModel viewModel)
                 this.StatusMessage = viewModel.StatusMessage;
+
+            if(e.PropertyName == "CurrentMaxThread" && sender is FileSystemInfoViewModel viewModelThread) 
+                this.currentMaxThread = viewModelThread.CurrentMaxThread;
         }
 
         public string GetFileContent(FileInfoViewModel viewModel)
@@ -138,6 +159,18 @@ namespace PT4.ViewModel
         private void OnSortingPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             Root.Sort(Sorting);
+
+        }
+
+
+        private async void OnSortingPropertyChangedAsync(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                Root.Sort(Sorting);
+                Debug.WriteLine(CurrentMaxThread);
+            });
+          
         }
 
         private void ExitExecute(object parameter)
