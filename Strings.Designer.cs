@@ -124,6 +124,24 @@ namespace PT4 {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Long Running.
+        /// </summary>
+        public static string Long_Running {
+            get {
+                return ResourceManager.GetString("Long_Running", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu None.
+        /// </summary>
+        public static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Open directory.
         /// </summary>
         public static string Open_Directory {
@@ -138,6 +156,15 @@ namespace PT4 {
         public static string Open_File {
             get {
                 return ResourceManager.GetString("Open_File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Prefer Fairness.
+        /// </summary>
+        public static string Prefer_Fairness {
+            get {
+                return ResourceManager.GetString("Prefer_Fairness", resourceCulture);
             }
         }
         

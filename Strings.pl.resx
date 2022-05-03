@@ -138,11 +138,20 @@
   <data name="Loading" xml:space="preserve">
     <value>Ładowanie </value>
   </data>
+  <data name="Long_Running" xml:space="preserve">
+    <value>Tyle ile zadań</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>Żadna</value>
+  </data>
   <data name="Open_Directory" xml:space="preserve">
     <value>Otwórz katalog</value>
   </data>
   <data name="Open_File" xml:space="preserve">
     <value>Otwórz plik</value>
+  </data>
+  <data name="Prefer_Fairness" xml:space="preserve">
+    <value>Preferuj Uczciwość</value>
   </data>
   <data name="Ready" xml:space="preserve">
     <value>Gotowe</value>

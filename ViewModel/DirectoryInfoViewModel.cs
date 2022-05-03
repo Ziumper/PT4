@@ -49,9 +49,11 @@ namespace PT4.ViewModel
         {
             if (args.PropertyName == "StatusMessage" && sender is FileSystemInfoViewModel viewModel)
                 this.StatusMessage = viewModel.StatusMessage;
-
+             
             if(args.PropertyName == "CurrentMaxThread" && sender is FileSystemInfoViewModel viewModelThread)
-                this.CurrentMaxThread = viewModelThread.CurrentMaxThread;
+            {
+                CurrentMaxThread = viewModelThread.CurrentMaxThread;
+            }
         }
 
 
@@ -120,8 +122,6 @@ namespace PT4.ViewModel
             bool isEmpty = !IsInitlized;
             if (isEmpty) return;
 
-          
-
             List<Task> tasks = new List<Task>();
             foreach(var item in Items)
             {
@@ -131,13 +131,13 @@ namespace PT4.ViewModel
                     task = Task.Factory.StartNew(() =>
                     {
                         var threadId = Thread.CurrentThread.ManagedThreadId;
+                        if(CurrentMaxThread < threadId)
                         CurrentMaxThread = threadId;
                         Debug.WriteLine("Thread id:" + threadId);
                         Debug.WriteLine("Sorting directory: " + item?.Model?.Name);
                         item?.Sort(sortingViewModel);
                         Debug.WriteLine("Completed: " + item?.Model?.Name);
-
-                    }, TaskCreationOptions.PreferFairness);
+                    }, sortingViewModel.TaskCreationOption);
 
                     if (item?.Model?.FullName != null)
                     {

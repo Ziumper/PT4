@@ -11,6 +11,7 @@
     <Window.Resources>
         <local:SortByBoolConverter x:Key="SortByBoolConverter"/>
         <local:DirectionBoolConverter x:Key="DirectionBoolConverter" />
+        <local:TaskCreationOptionConverter x:Key="TaskCreationOptionConverter" />
         <Style x:Key="{x:Type RadioButton}" TargetType="{x:Type RadioButton}">
             <Setter Property="Margin" Value="5" />
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -53,6 +54,31 @@
                 GroupName="sortOrder" Name="Descending">
                 <Label Content="{Binding Source={StaticResource Strings}, Path=Descending_Order}"/>
             </RadioButton>
+
+            <Label Content="Strategia podziału zadań:"/>
+            <RadioButton
+                  IsChecked="{Binding TaskCreationOption, Converter={StaticResource TaskCreationOptionConverter}, ConverterParameter=0}"
+                GroupName="taskExecuteGroup" Name="None"
+                >
+                <Label Content="{Binding Source={StaticResource Strings}, Path=None}"></Label>
+            </RadioButton>
+            <RadioButton
+                  IsChecked="{Binding TaskCreationOption, Converter={StaticResource TaskCreationOptionConverter}, ConverterParameter=1}"
+                GroupName="taskExecuteGroup" Name="PreferFairness"
+                >
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Prefer_Fairness}"></Label>
+            </RadioButton>
+            <RadioButton
+                  IsChecked="{Binding TaskCreationOption, Converter={StaticResource TaskCreationOptionConverter}, ConverterParameter=2}"
+                GroupName="taskExecuteGroup" Name="LongRunning"
+                >
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Long_Running}"></Label>
+            </RadioButton>
+            
         </StackPanel>
+        
+           
+
+       
     </Grid>
 </Window>

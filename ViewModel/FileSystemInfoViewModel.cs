@@ -137,17 +137,14 @@ namespace PT4.ViewModel
             get => currentMaxThread;
             set
             {
-                if(value > currentMaxThread)
+                if(value != currentMaxThread)
                 {
                     currentMaxThread = value;
                     NotifyPropertyChanged();
                 }
             }
         }
-
-
-
-
+      
         public virtual void Sort(SortingViewModel sorting)
         {
 

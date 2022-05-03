@@ -78,11 +78,10 @@ namespace PT4.ViewModel
             }
             set
             {
-                if (value > currentMaxThread) { 
+                if (currentMaxThread != value) { 
                     currentMaxThread = value;
                     NotifyPropertyChanged();
                 }
-                
             }
         }
 
@@ -168,7 +167,8 @@ namespace PT4.ViewModel
             await Task.Factory.StartNew(() =>
             {
                 Root.Sort(Sorting);
-                Debug.WriteLine(CurrentMaxThread);
+                Debug.WriteLine("Max thread id:" + CurrentMaxThread);
+                Root.CurrentMaxThread = 0;
             });
           
         }

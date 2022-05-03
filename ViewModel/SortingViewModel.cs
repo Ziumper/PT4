@@ -11,6 +11,7 @@ namespace PT4.ViewModel
     {
         private SortBy sortBy;
         private Direction direction;
+        private TaskCreationOptions taskCreationOption;
 
         public SortBy SortBy
         {
@@ -26,6 +27,12 @@ namespace PT4.ViewModel
         {
             get { return direction; }
             set { direction = value; NotifyPropertyChanged(); }
+        }
+
+        public TaskCreationOptions TaskCreationOption
+        {
+            get { return taskCreationOption; }
+            set { taskCreationOption = value; NotifyPropertyChanged(); }
         }
     }
 }
