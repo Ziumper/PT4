@@ -168,6 +168,7 @@ namespace PT4.ViewModel
             {
                 Root.Sort(Sorting);
                 Debug.WriteLine("Max thread id:" + CurrentMaxThread);
+                Debug.WriteLine("==================================================");
                 Root.CurrentMaxThread = 0;
             });
           
