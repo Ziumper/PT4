@@ -19,6 +19,7 @@ namespace PT4.ViewModel
         private FileSystemWatcher? watcher;
         private string? path;
         private string imageSource = "Resources/FolderClose.png";
+        private CancellationToken token;
 
         public DirectoryInfoViewModel(ViewModelBase owner) : base(owner)
         {
@@ -96,29 +97,31 @@ namespace PT4.ViewModel
             Application.Current.Dispatcher.Invoke(() => OnFileSystemChanged(e));
         }
 
-        public bool Open(string path)
+        public bool Open(string path, CancellationToken token)
         {
-            StatusMessage = Strings.Loading;
+            this.token = token;
             this.path = path;
-            bool result = false;
             try
             {
                 Items.Clear();
-                ReadCatalogs();
-                ReadFiles();
-                result = true;
-            } catch (Exception ex)
+                ReadCatalogs(token);
+                ReadFiles(token);
+            } catch (OperationCanceledException exception)
             {
-                Exception = ex;
+                StatusMessage = Strings.Cancelled_Operation;
+                return false;
+            } finally
+            {
+                InitlizeWatcher();
             }
-
-            if (result) InitlizeWatcher();
-
-            return result;
+            
+            return true;
         }
 
-        public override void Sort(SortingViewModel sortingViewModel)
+        public void Sort(SortingViewModel sortingViewModel, CancellationToken token)
         {
+            if (token.IsCancellationRequested) return;
+
             bool isEmpty = !IsInitlized;
             if (isEmpty) return;
 
@@ -126,18 +129,19 @@ namespace PT4.ViewModel
             foreach(var item in Items)
             {
                 Task task = null;
-                if (item is DirectoryInfoViewModel)
+                if (item is DirectoryInfoViewModel directoryItem)
                 {
                     task = Task.Factory.StartNew(() =>
                     {
+                        if (token.IsCancellationRequested) { token.ThrowIfCancellationRequested(); }
                         var threadId = Thread.CurrentThread.ManagedThreadId;
                         if(CurrentMaxThread < threadId)
                         CurrentMaxThread = threadId;
                         Debug.WriteLine("Thread id:" + threadId);
                         Debug.WriteLine("Sorting directory: " + item?.Model?.Name);
-                        item?.Sort(sortingViewModel);
-                        Debug.WriteLine("Completed: " + item?.Model?.Name);
-                    }, sortingViewModel.TaskCreationOption);
+                        directoryItem?.Sort(sortingViewModel,token);
+                        Debug.WriteLine("Completed: " + directoryItem?.Model?.Name);
+                    },token,sortingViewModel.TaskCreationOption, TaskScheduler.Default);
 
                     if (item?.Model?.FullName != null)
                     {
@@ -148,9 +152,21 @@ namespace PT4.ViewModel
                 if(task != null)tasks.Add(task);
             }
 
-            Task.WaitAll(tasks.ToArray());
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            } catch (AggregateException ex)
+            {
+                StatusMessage = Strings.Cancelled_Operation;
+                return;
+            } catch (OperationCanceledException)
+            {
+                StatusMessage = Strings.Cancelled_Operation;
+                return;
+            }
 
-           
+            if (token.IsCancellationRequested) return;
+
             var orderableItems = Items.OrderBy(OrderByType);
 
             if (sortingViewModel.Direction == Direction.Ascending)
@@ -225,29 +241,61 @@ namespace PT4.ViewModel
             return 1;
         }
 
-        private void ReadCatalogs()
+        private void ReadCatalogs(CancellationToken token)
         {
             foreach (var dirName in Directory.GetDirectories(path))
             {
-                var dirInfo = new DirectoryInfo(dirName);
-                DirectoryInfoViewModel itemViewModel = new DirectoryInfoViewModel(this);
-                itemViewModel.Model = dirInfo;
-                Items.Add(itemViewModel);
+                try
+                {
+                    if(token.IsCancellationRequested)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                    var dirInfo = new DirectoryInfo(dirName);
 
-                //recurrecny load
-                itemViewModel.Open(dirName);
+                    DirectoryInfoViewModel itemViewModel = new DirectoryInfoViewModel(this);
+                    itemViewModel.Model = dirInfo;
+                    Items.Add(itemViewModel);
+
+                    //recurrecny load
+                    itemViewModel.Open(dirName,token);
+                } catch (OperationCanceledException ex)
+                {
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+                    // do nothing
+                }
+                
             }
+            
+            
         }
 
-        private void ReadFiles()
+        private void ReadFiles(CancellationToken token)
         {
             if (path == null) return;
             foreach (var fileName in Directory.GetFiles(path))
             {
-                var fileInfo = new FileInfo(fileName);
-                FileInfoViewModel itemViewModel = new FileInfoViewModel(this);
-                itemViewModel.Model = fileInfo;
-                Items.Add(itemViewModel);
+                try
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+                    var fileInfo = new FileInfo(fileName);
+                    FileInfoViewModel itemViewModel = new FileInfoViewModel(this);
+                    itemViewModel.Model = fileInfo;
+                    Items.Add(itemViewModel);
+                } catch (OperationCanceledException ex)
+                {
+                    throw ex;
+                }
+                catch (Exception ex)
+                {
+                    //do nothing
+                }
             }
         }
 
@@ -272,7 +320,15 @@ namespace PT4.ViewModel
         private void OnFileSystemChanged(FileSystemEventArgs e)
         {
             if (e.ChangeType == WatcherChangeTypes.Changed) return;
-            if(path != null) Open(path);
+            if(path != null)
+                try
+                {
+                    Open(path, token);
+                }catch (Exception ex)
+                {
+                    // do nothing
+                }
+                
         }
 
         

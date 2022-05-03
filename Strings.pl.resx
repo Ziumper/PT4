@@ -120,6 +120,12 @@
   <data name="Ascending_Order" xml:space="preserve">
     <value>Rosnąco</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="Cancelled_Operation" xml:space="preserve">
+    <value>Akcja została prawidłowo zatrzymana</value>
+  </data>
   <data name="Created_Sorting" xml:space="preserve">
     <value>Stworzono zadanie sortowania dla:</value>
   </data>

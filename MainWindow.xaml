@@ -92,7 +92,10 @@
             </TextBox>
         </ScrollViewer>
         <StatusBar Grid.Row="3" Grid.ColumnSpan="2">
-            <TextBlock Name="PropertiesTextBlock" Text="{Binding StatusMessage}"></TextBlock>
+            <Button Command="{Binding OnCancelOperationCommand}">
+                <Label Content="{Binding Source={StaticResource Strings}, Path=Cancel}"/>
+            </Button>
+            <TextBlock  Name="PropertiesTextBlock" Text="{Binding StatusMessage}"></TextBlock>
         </StatusBar>
 
     </Grid>

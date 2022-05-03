@@ -70,6 +70,24 @@ namespace PT4 {
         }
         
         /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Cancel.
+        /// </summary>
+        public static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        /// Wyszukuje zlokalizowany ciąg podobny do ciągu Operation has been cancelled succesfully .
+        /// </summary>
+        public static string Cancelled_Operation {
+            get {
+                return ResourceManager.GetString("Cancelled_Operation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         /// Wyszukuje zlokalizowany ciąg podobny do ciągu Sroting task has been created for:.
         /// </summary>
         public static string Created_Sorting {

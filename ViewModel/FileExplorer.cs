@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -16,6 +17,7 @@ namespace PT4.ViewModel
         private SortingViewModel sorting;
         private string statusMessage;
         private int currentMaxThread;
+        private CancellationTokenSource source;
 
         public static readonly string[] TextFilesExtensions = new string[] { ".txt", ".ini", ".log" };
         public event EventHandler<FileInfoViewModel> OnOpenFileRequest;
@@ -24,6 +26,7 @@ namespace PT4.ViewModel
         public ICommand SortRootFolderCommand { get; private set; }
         public ICommand ExitCommand { get; private set; }
         public ICommand OpenFileCommand { get; private set; }
+        public ICommand OnCancelOperationCommand { get; private set; }
 
         public DirectoryInfoViewModel Root
         {
@@ -106,6 +109,19 @@ namespace PT4.ViewModel
             ExitCommand = new RelayCommand(ExitExecute);
 
             OpenFileCommand = new RelayCommand(OnOpenFileCommand, OpenFileCanExecute);
+            OnCancelOperationCommand = new RelayCommand(OnCancelClicked);
+        }
+
+        private void OnCancelClicked(object obj)
+        {
+            if(source != null)
+            try
+            {
+                source.Cancel();
+            } catch (Exception ex)
+            {
+                // do nothing
+            }
         }
 
         private void Root_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -155,22 +171,30 @@ namespace PT4.ViewModel
             return false;
         }
 
-        private void OnSortingPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            Root.Sort(Sorting);
-
-        }
-
 
         private async void OnSortingPropertyChangedAsync(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            await Task.Factory.StartNew(() =>
-            {
-                Root.Sort(Sorting);
-                Debug.WriteLine("Max thread id:" + CurrentMaxThread);
-                Debug.WriteLine("==================================================");
-                Root.CurrentMaxThread = 0;
-            });
+            source = new CancellationTokenSource();
+        
+                await Task.Factory.StartNew(() =>
+                {
+                try
+                {
+                    Root.Sort(Sorting, source.Token);
+                    Debug.WriteLine("Max thread id:" + CurrentMaxThread);
+                    Debug.WriteLine("==================================================");
+                    Root.CurrentMaxThread = 0;
+                }
+                    catch (Exception)
+                    {
+                        StatusMessage = Strings.Cancelled_Operation;
+                    }
+                    finally
+                    {
+                        source.Dispose();
+                        source = new CancellationTokenSource();
+                    }
+                }, source.Token);
           
         }
 
@@ -187,44 +211,43 @@ namespace PT4.ViewModel
             window.Close();
         }
 
-        private void OpenRootFolderExecute(object parameter)
-        {
-         
-            var dlg = new System.Windows.Forms.FolderBrowserDialog() { Description = Strings.Directory_Description };
-            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                var path = dlg.SelectedPath;
-                OpenRoot(path);
-            }
-
-            Root.Sort(Sorting);
-        }
-
         private async void OpenRootFolderExecuteAsync(object parameter)
         {
+            source = new CancellationTokenSource();
             var dlg = new System.Windows.Forms.FolderBrowserDialog() { Description = Strings.Open_Directory };
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                await Task.Factory.StartNew(() =>
+                try
                 {
-         
-                var path = dlg.SelectedPath;
-                    OpenRoot(path);
-                });
+                    await Task.Factory.StartNew(() =>
+                    {
+                        StatusMessage = Strings.Loading;
+                        var path = dlg.SelectedPath;
+                        bool result = Root.Open(path, source.Token);
+                        if(result) StatusMessage = Strings.Ready;
+                    }, source.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    StatusMessage = Strings.Cancelled_Operation;
+                }
+                finally
+                {
+                    source.Dispose();
+                    source = new CancellationTokenSource();
+                }
             }
-
-            StatusMessage = Strings.Ready;
         }
 
-        private void OpenRoot(string path)
+        private void OpenRoot(string path,CancellationToken token)
         {
-            Root.Open(path);
+            
         }
 
         private void SortRootFolderExecute(object parameter)
         {
             Window window = new SortingDialog(Sorting);
-            window.ShowDialog();
+            window.Show();
         }
 
         private bool CanExecuteSort(object parameter)

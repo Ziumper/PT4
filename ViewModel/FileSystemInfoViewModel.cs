@@ -145,11 +145,6 @@ namespace PT4.ViewModel
             }
         }
       
-        public virtual void Sort(SortingViewModel sorting)
-        {
-
-        }
-
         protected void SetProperties(FileSystemInfo model)
         {
             fileSystemInfo = model;
