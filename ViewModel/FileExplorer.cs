@@ -183,6 +183,7 @@ namespace PT4.ViewModel
                     Root.Sort(Sorting, source.Token);
                     Debug.WriteLine("Max thread id:" + CurrentMaxThread);
                     Debug.WriteLine("==================================================");
+                    StatusMessage = Strings.Ready;
                     Root.CurrentMaxThread = 0;
                 }
                     catch (Exception)
